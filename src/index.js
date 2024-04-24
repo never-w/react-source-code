@@ -6,7 +6,7 @@ import ReactDOM from './react-dom'
 import React from './react'
 
 const ele = (
-  <div style="color: red;">
+  <div style={{ color: 'red' }}>
     hello world
     <span>xxxx</span>
     <p>fsdfs</p>
