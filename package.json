@@ -8,7 +8,7 @@
     "react-scripts": "5.0.1"
   },
   "scripts": {
-    "start": "DISABLE_NEW_JSX_TRANSFORM=true react-scripts start"
+    "start": "cross-env DISABLE_NEW_JSX_TRANSFORM=true react-scripts start"
   },
   "browserslist": {
     "production": [
@@ -21,5 +21,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
   }
 }
