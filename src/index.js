@@ -13,6 +13,25 @@ const element = (
   </div>
 )
 
-ReactDOM.render(element, document.getElementById("root"))
+function MyFunctionComponent(props) {
+  return (
+    <div style={{ color: "red" }}>
+      hello world
+      <span>xxxx</span>
+      <p>xxxxxxxx</p>
+    </div>
+  )
+}
 
-console.log(element, "++++")
+// 虚拟 DOM 对象
+// const ele = {
+//   $$typeof: REACT_ELEMENT,
+//   key: null,
+//   props: { children: "xxx" },
+//   ref: null,
+//   type: "div",
+// }
+
+ReactDOM.render(<MyFunctionComponent />, document.getElementById("root"))
+
+// console.log(<MyFunctionComponent />, "++++")
