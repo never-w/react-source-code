@@ -42,8 +42,6 @@ function getDomByFunctionComponent(VNode) {
   let renderVNode = type(props)
   if (!renderVNode) return null
   return createDOM(renderVNode)
-
-  return dom
 }
 
 function setPropsForDOM(dom, VNodeProps = {}) {
