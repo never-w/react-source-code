@@ -1,9 +1,9 @@
-import { REACT_ELEMENT } from './utils'
+import { REACT_ELEMENT } from "./utils"
 
 function createElement(type, properties, children) {
   const ref = properties.ref || null
   const key = properties.key || null
-  ;['key', 'ref', '__self', '__source'].forEach((key) => {
+  ;["key", "ref", "__self", "__source"].forEach((key) => {
     delete properties[key]
   })
   const props = { ...properties }
