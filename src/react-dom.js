@@ -16,6 +16,9 @@ function createDOM(VNode) {
   const { type, props } = VNode
   let dom
 
+  if (typeof type === "function" && VNode.$$typeof === REACT_ELEMENT && type.IS_CLASS_COMPONENT) {
+    return getDomByClassComponent(VNode)
+  }
   if (typeof type === "function" && VNode.$$typeof === REACT_ELEMENT) {
     return getDomByFunctionComponent(VNode)
   }
@@ -35,6 +38,14 @@ function createDOM(VNode) {
 
   setPropsForDOM(dom, props)
   return dom
+}
+
+function getDomByClassComponent(VNode) {
+  let { type, props } = VNode
+  let instance = new type(props)
+  let renderVNode = instance.render()
+  if (!renderVNode) return null
+  return createDOM(renderVNode)
 }
 
 function getDomByFunctionComponent(VNode) {

@@ -5,6 +5,7 @@
 import ReactDOM from "./react-dom"
 import React from "./react"
 
+// jsx 组件
 const element = (
   <div style={{ color: "red" }}>
     hello world
@@ -13,6 +14,7 @@ const element = (
   </div>
 )
 
+// 函数组件
 function MyFunctionComponent(props) {
   return (
     <div style={{ color: "red" }}>
@@ -21,6 +23,18 @@ function MyFunctionComponent(props) {
       <p>xxxxxxxx</p>
     </div>
   )
+}
+
+// 类组件
+class MyClassComponent extends React.Component {
+  render() {
+    return (
+      <div style={{ color: "red" }}>
+        hello world
+        <p>{this.props.xx}</p>
+      </div>
+    )
+  }
 }
 
 // 虚拟 DOM 对象
@@ -32,6 +46,6 @@ function MyFunctionComponent(props) {
 //   type: "div",
 // }
 
-ReactDOM.render(<MyFunctionComponent />, document.getElementById("root"))
+ReactDOM.render(<MyClassComponent xx="child1" />, document.getElementById("root"))
 
-// console.log(<MyFunctionComponent />, "++++")
+// console.log(<MyClassComponent />, "++++")

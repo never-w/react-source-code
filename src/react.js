@@ -1,3 +1,4 @@
+import { Component } from "./Component"
 import { REACT_ELEMENT } from "./utils"
 
 function createElement(type, properties, children) {
@@ -23,5 +24,5 @@ function createElement(type, properties, children) {
   }
 }
 
-const React = { createElement }
+const React = { createElement, Component }
 export default React
