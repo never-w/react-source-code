@@ -10,7 +10,6 @@ const element = (
   <div style={{ color: "red" }}>
     hello world
     <span>xxxx</span>
-    <p>fsdfs</p>
   </div>
 )
 
@@ -29,7 +28,7 @@ function MyFunctionComponent(props) {
 class MyClassComponent extends React.Component {
   render() {
     return (
-      <div style={{ color: "red" }}>
+      <div style={{ color: "red" }} onClick={() => {}}>
         hello world
         <p>{this.props.xx}</p>
       </div>
@@ -48,4 +47,4 @@ class MyClassComponent extends React.Component {
 
 ReactDOM.render(<MyClassComponent xx="child1" />, document.getElementById("root"))
 
-// console.log(<MyClassComponent />, "++++")
+console.log(element, "++++")
