@@ -39,18 +39,17 @@ class Updater {
   }
 
   launchUpdate() {
-    const { ClassComponentInstance, pendingStates } = this
-    if (pendingStates.length === 0) return
+    if (this.pendingStates.length === 0) return
 
-    ClassComponentInstance.state = this.pendingStates.reduce((preState, newState) => {
+    this.ClassComponentInstance.state = this.pendingStates.reduce((preState, newState) => {
       return {
         ...preState,
         ...newState,
       }
-    }, ClassComponentInstance.state)
+    }, this.ClassComponentInstance.state)
 
     this.pendingStates.length = 0
-    ClassComponentInstance.update()
+    this.ClassComponentInstance.update()
   }
 }
 
