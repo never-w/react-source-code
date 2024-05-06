@@ -37,6 +37,7 @@ function createDOM(VNode) {
   }
 
   setPropsForDOM(dom, props)
+  VNode.dom = dom
   return dom
 }
 
@@ -44,6 +45,11 @@ function getDomByClassComponent(VNode) {
   let { type, props } = VNode
   let instance = new type(props)
   let renderVNode = instance.render()
+  instance.oldVNode = renderVNode
+  // TODO:  到时删除代码
+  setTimeout(() => {
+    instance.setState({ xxx: "99999999999" })
+  }, 3000)
   if (!renderVNode) return null
   return createDOM(renderVNode)
 }
@@ -80,6 +86,17 @@ function mountArray(children, parent) {
       mount(children[i], parent)
     }
   }
+}
+
+export function findDomByVNode(VNode) {
+  if (!VNode) return
+  if (VNode.dom) return VNode.dom
+}
+
+export function updateDomTree(oldDOM, newVNode) {
+  const parentNode = oldDOM.parentNode
+  parentNode.removeChild(oldDOM)
+  parentNode.appendChild(createDOM(newVNode))
 }
 
 const ReactDOM = {

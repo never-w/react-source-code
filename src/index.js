@@ -26,11 +26,15 @@ function MyFunctionComponent(props) {
 
 // 类组件
 class MyClassComponent extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { xxx: "999" }
+  }
   render() {
     return (
       <div style={{ color: "red" }} onClick={() => {}}>
         hello world
-        <p>{this.props.xx}</p>
+        <p>{this.state.xxx}</p>
       </div>
     )
   }

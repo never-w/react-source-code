@@ -1,10 +1,16 @@
+import { findDomByVNode, updateDomTree } from "./react-dom"
+
 export let updaterQueue = {
   isBatch: false,
   updaters: new Set(),
 }
 
 export function flushUpdaterQueue() {
-  updaterQueue.isBatch = true
+  updaterQueue.isBatch = false
+  for (let updater of updaterQueue.updaters) {
+    updater.launchUpdate()
+  }
+  updaterQueue.updaters.clear()
 }
 
 class Updater {
@@ -68,5 +74,10 @@ export class Component {
     // 1. 获取重新执行render函数后的虚拟DOM 新虚拟DOM
     // 2. 根据新虚拟DOM生成新的真实DOM
     // 3. 将真实DOM挂载到页面上
+    let oldVNode = this.oldVNode // TODO: 让类组件拥有一个oldVNode
+    let oldDOM = findDomByVNode(oldVNode)
+    let newVNode = this.render()
+    updateDomTree(oldDOM, newVNode)
+    this.oldVNode = newVNode
   }
 }
