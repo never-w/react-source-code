@@ -36,6 +36,9 @@ class MyClassComponent extends React.Component {
     this.setState({
       count: newText + "",
     })
+    this.setState({
+      count: newText + "",
+    })
   }
 
   render() {

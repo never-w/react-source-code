@@ -29,8 +29,14 @@ function dispatchEvent(nativeEvent) {
   flushUpdaterQueue()
 }
 
+/**
+ * 1. 事件源：普通浏览器：event.target，IE: event.srcElement
+ * 2. 阻止冒泡：微软浏览器：cancelBubble = true，普通浏览器：stopPropagation()
+ * 3. window.event.returnValue = false，event.preventDefault()
+ */
 function createSyntheticEvent(nativeEvent) {
   let nativeEventKeyValues = {}
+
   for (let key in nativeEvent) {
     nativeEventKeyValues[key] = typeof nativeEvent[key] === "function" ? nativeEvent[key].bind(nativeEvent) : nativeEvent[key]
   }
