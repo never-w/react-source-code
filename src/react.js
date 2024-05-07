@@ -1,5 +1,5 @@
 import { Component } from "./Component"
-import { REACT_ELEMENT } from "./utils"
+import { REACT_ELEMENT, REACT_FORWARD_REF } from "./utils"
 
 function createElement(type, properties, children) {
   const ref = properties.ref || null
@@ -24,5 +24,18 @@ function createElement(type, properties, children) {
   }
 }
 
-const React = { createElement, Component }
+function createRef() {
+  return {
+    current: null,
+  }
+}
+
+function forwardRef(render) {
+  return {
+    $$typeof: REACT_FORWARD_REF,
+    render,
+  }
+}
+
+const React = { createElement, Component, createRef, forwardRef }
 export default React

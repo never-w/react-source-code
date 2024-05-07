@@ -5,27 +5,7 @@
 import ReactDOM from "./react-dom"
 import React from "./react"
 
-// jsx 组件
-const element = (
-  <div style={{ color: "red" }}>
-    hello world
-    <span>xxxx</span>
-  </div>
-)
-
-// 函数组件
-function MyFunctionComponent(props) {
-  return (
-    <div style={{ color: "red" }}>
-      hello world
-      <span>xxxx</span>
-      <p>xxxxxxxx</p>
-    </div>
-  )
-}
-
-// 类组件
-class MyClassComponent extends React.Component {
+class ClassComponent extends React.Component {
   counter = 0
   constructor(props) {
     super(props)
@@ -60,15 +40,32 @@ class MyClassComponent extends React.Component {
   }
 }
 
-// 虚拟 DOM 对象
-// const ele = {
-//   $$typeof: REACT_ELEMENT,
-//   key: null,
-//   props: { children: "xxx" },
-//   ref: null,
-//   type: "div",
-// }
+const ForwardRefFunctionComponent = React.forwardRef((props, ref) => {
+  return <input ref={ref}>MyForwardRefFunctionComponent</input>
+})
 
-ReactDOM.render(<MyClassComponent xx="child1" />, document.getElementById("root"))
+function FunctionComponent(props) {
+  const forwardRef = React.createRef()
+  const classRef = React.createRef()
+  const elementRef = React.createRef()
 
-console.log(element, "++++")
+  const changeInput = () => {
+    forwardRef.current.value = "ForwardRef...."
+    classRef.current.updateShowText("100")
+    elementRef.current.value = "..."
+  }
+
+  return (
+    <div>
+      <ForwardRefFunctionComponent ref={forwardRef} />
+      <br />
+      <input ref={elementRef} />
+      <br />
+      <input type="button" onClick={changeInput} value={"点击加省略号"} />
+      <br />
+      <ClassComponent ref={classRef} />
+    </div>
+  )
+}
+
+ReactDOM.render(<FunctionComponent />, document.getElementById("root"))
