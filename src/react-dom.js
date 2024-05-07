@@ -1,4 +1,5 @@
 import { REACT_ELEMENT } from "./utils"
+import { addEvent } from "./event"
 
 function render(VNode, containerDOM) {
   // 将虚拟 DOM 转化成真实 DOM
@@ -46,10 +47,6 @@ function getDomByClassComponent(VNode) {
   let instance = new type(props)
   let renderVNode = instance.render()
   instance.oldVNode = renderVNode
-  // TODO:  到时删除代码
-  setTimeout(() => {
-    instance.setState({ xxx: "99999999999" })
-  }, 3000)
   if (!renderVNode) return null
   return createDOM(renderVNode)
 }
@@ -66,7 +63,7 @@ function setPropsForDOM(dom, VNodeProps = {}) {
   for (let key in VNodeProps) {
     if (key === "children") continue
     if (/^on[A-Z].*/.test(key)) {
-      // TODO: 事件时再去处理
+      addEvent(dom, key.toLocaleLowerCase(), VNodeProps[key])
     } else if (key === "style") {
       Object.keys(VNodeProps[key]).forEach((styleName) => {
         dom.style[styleName] = VNodeProps[key][styleName]
