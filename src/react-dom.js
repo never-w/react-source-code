@@ -103,7 +103,7 @@ export function findDomByVNode(VNode) {
 }
 
 export function updateDomTree(oldVNode, newVNode, oldDOM) {
-  const parentNode = oldDOM.parentNode
+  // const parentNode = oldDOM.parentNode
   // 新节点，旧节点都不存在
   // 新节点存在，旧节点不存在
   // 新节点不存在，旧节点存在
@@ -245,6 +245,8 @@ function updateChildren(parentDOM, oldVNodeChildren, newVNodeChildren) {
       }
     }
     if (childNode) {
+      console.log(childNode)
+      console.log(getDomForInsert())
       parentDOM.insertBefore(getDomForInsert(), childNode)
     } else {
       parentDOM.appendChild(getDomForInsert())
