@@ -56,7 +56,12 @@ function getDomByClassComponent(VNode) {
   // 绑定ref
   ref && (ref.current = instance)
   if (!renderVNode) return null
-  return createDOM(renderVNode)
+
+  const dom = createDOM(renderVNode)
+  // 为了简化一下 componentDidMount 写法，这里时间稍微比 React 内部实现的 componentDidMount 晚一点时间，
+  // 这里是在根据虚拟 DOM 创建完成真实DOM 之后就调用，而真实的React内部是挂载之后调用
+  if (instance.componentDidMount) instance.componentDidMount()
+  return dom
 }
 
 function getDomByForwardRefFunction(VNode) {
@@ -138,6 +143,9 @@ export function updateDomTree(oldVNode, newVNode, oldDOM) {
 function removeVNode(VNode) {
   const currentDOM = findDomByVNode(VNode)
   if (currentDOM) currentDOM.remove()
+  if (VNode.classInstance && VNode.classInstance.componentWillUnmount) {
+    VNode.classInstance.componentWillUnmount()
+  }
 }
 
 function deepDOMDiff(oldVNode, newVNode) {

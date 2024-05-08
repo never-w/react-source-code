@@ -5,6 +5,7 @@
 import ReactDOM from "./react-dom"
 import React from "./react"
 
+// 测试 setState 组件状态变更
 // class ClassComponent extends React.Component {
 //   counter = 0
 //   constructor(props) {
@@ -75,7 +76,7 @@ class MyClassComponent extends React.Component {
   newArr = ["C", "B", "E", "F", "A"]
   constructor(props) {
     super(props)
-    this.state = { arr: this.oldArr }
+    this.state = { arr: this.oldArr, date: new Date() }
   }
 
   updateShowArr() {
@@ -83,6 +84,25 @@ class MyClassComponent extends React.Component {
       arr: this.isReset ? this.oldArr : this.newArr,
     })
     this.isReset = !this.isReset
+  }
+
+  componentDidMount() {
+    this.timerID = setInterval(() => this.tick(), 1000)
+    console.log("componentDidMount")
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID)
+  }
+
+  componentDidUpdate() {
+    console.log("componentDidUpdate", this.state.date)
+  }
+
+  tick() {
+    this.setState({
+      date: new Date(),
+    })
   }
 
   render() {

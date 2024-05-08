@@ -74,9 +74,13 @@ export class Component {
     // 2. 根据新虚拟DOM生成新的真实DOM
     // 3. 将真实DOM挂载到页面上
     let oldVNode = this.oldVNode // TODO: 让类组件拥有一个oldVNode
-    let oldDOM = findDomByVNode(oldVNode)
+    let oldDOM = findDomByVNode(oldVNode) // TODO: 将真实DOM保存到对应的虚拟DOM上
     let newVNode = this.render()
     updateDomTree(oldVNode, newVNode, oldDOM)
     this.oldVNode = newVNode
+
+    if (this.componentDidUpdate) {
+      this.componentDidUpdate(this.props, this.state)
+    }
   }
 }
