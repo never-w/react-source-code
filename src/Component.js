@@ -76,7 +76,7 @@ export class Component {
     let oldVNode = this.oldVNode // TODO: 让类组件拥有一个oldVNode
     let oldDOM = findDomByVNode(oldVNode)
     let newVNode = this.render()
-    updateDomTree(oldDOM, newVNode)
+    updateDomTree(oldVNode, newVNode, oldDOM)
     this.oldVNode = newVNode
   }
 }

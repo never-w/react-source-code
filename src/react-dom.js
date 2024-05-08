@@ -1,4 +1,4 @@
-import { REACT_ELEMENT, REACT_FORWARD_REF } from "./utils"
+import { REACT_ELEMENT, REACT_FORWARD_REF, REACT_TEXT } from "./utils"
 import { addEvent } from "./event"
 
 function render(VNode, containerDOM) {
@@ -26,7 +26,11 @@ function createDOM(VNode) {
   if (typeof type === "function" && VNode.$$typeof === REACT_ELEMENT) {
     return getDomByFunctionComponent(VNode)
   }
-  if (type && VNode.$$typeof === REACT_ELEMENT) {
+
+  if (type === REACT_TEXT) {
+    // 处理文本节点
+    dom = document.createTextNode(props.text)
+  } else if (type && VNode.$$typeof === REACT_ELEMENT) {
     dom = document.createElement(type)
   }
 
@@ -35,8 +39,6 @@ function createDOM(VNode) {
       mount(props.children, dom)
     } else if (Array.isArray(props.children)) {
       mountArray(props.children, dom)
-    } else if (typeof props.children === "string") {
-      dom.appendChild(document.createTextNode(props.children))
     }
   }
 
@@ -90,11 +92,8 @@ function setPropsForDOM(dom, VNodeProps = {}) {
 function mountArray(children, parent) {
   if (!Array.isArray(children)) return
   for (let i = 0; i < children.length; i++) {
-    if (typeof children[i] === "string") {
-      parent.appendChild(document.createTextNode(children[i]))
-    } else {
-      mount(children[i], parent)
-    }
+    children[i].index = i
+    mount(children[i], parent)
   }
 }
 
@@ -103,11 +102,90 @@ export function findDomByVNode(VNode) {
   if (VNode.dom) return VNode.dom
 }
 
-export function updateDomTree(oldDOM, newVNode) {
+export function updateDomTree(oldVNode, newVNode, oldDOM) {
   const parentNode = oldDOM.parentNode
-  parentNode.removeChild(oldDOM)
-  parentNode.appendChild(createDOM(newVNode))
+  // 新节点，旧节点都不存在
+  // 新节点存在，旧节点不存在
+  // 新节点不存在，旧节点存在
+  // 新节点存在，旧节点也存在，但是类型不一样
+  // 新节点存在，旧节点也存在，类型也一样 ---> 值得我们进行深入的比较，探索复用相关节点的方案
+  const typeMap = {
+    NO_OPERATE: !oldVNode && !newVNode,
+    ADD: !oldVNode && newVNode,
+    DELETE: oldVNode && !newVNode,
+    REPLACE: oldVNode && newVNode && oldVNode.type !== newVNode.type,
+  }
+  const UPDATE_TYPE = Object.keys(typeMap).filter((key) => typeMap[key])[0]
+  switch (UPDATE_TYPE) {
+    case "NO_OPERATE":
+      break
+    case "DELETE":
+      removeVNode(oldVNode)
+      break
+    case "ADD":
+      oldDOM.parentNode.appendChild(createDOM(newVNode))
+      break
+    case "REPLACE":
+      removeVNode(oldVNode)
+      oldDOM.parentNode.appendChild(createDOM(newVNode))
+      break
+    default:
+      deepDOMDiff(oldVNode, newVNode)
+      break
+  }
 }
+
+function removeVNode(VNode) {
+  const currentDOM = findDomByVNode(VNode)
+  if (currentDOM) currentDOM.remove()
+}
+
+function deepDOMDiff(oldVNode, newVNode) {
+  const diffTypeMap = {
+    ORIGIN_NODE: typeof oldVNode.type === "string",
+    CLASS_COMPONENT: typeof oldVNode.type === "function" && oldVNode.type.IS_CLASS_COMPONENT,
+    FUNCTION_COMPONENT: typeof oldVNode.type === "function",
+    TEXT: oldVNode.type === REACT_TEXT,
+  }
+
+  const DIFF_TYPE = Object.keys(diffTypeMap).filter((key) => diffTypeMap[key])[0]
+  switch (DIFF_TYPE) {
+    case "ORIGIN_NODE":
+      const currentDOM = (newVNode.dom = findDomByVNode(oldVNode))
+      setPropsForDOM(currentDOM, newVNode.props)
+      updateChildren(currentDOM, oldVNode.props.children, newVNode.props.children)
+      break
+    case "CLASS_COMPONENT":
+      updateClassComponent(oldVNode, newVNode)
+      break
+    case "FUNCTION_COMPONENT":
+      updateFunctionComponent(oldVNode, newVNode)
+      break
+    case "TEXT":
+      newVNode.dom = findDomByVNode(oldVNode)
+      newVNode.dom.textContent = newVNode.props.text
+      break
+    default:
+      break
+  }
+}
+
+function updateClassComponent(oldVNode, newVNode) {
+  const classInstance = (newVNode.classInstance = oldVNode.classInstance)
+  classInstance.updater.launchUpdate()
+}
+
+function updateFunctionComponent(oldVNode, newVNode) {
+  const oldDOM = findDomByVNode(oldVNode)
+  if (!oldDOM) return
+  const { type, props } = newVNode
+  const newRenderVNode = type(props)
+  updateDomTree(oldVNode.oldRenderVNode, newRenderVNode, oldDOM)
+  newVNode.oldRenderVNode = newRenderVNode
+}
+
+// DOM DIFF 算法的核心
+function updateChildren(parentDOM, oldVNodeChildren, newVNodeChildren) {}
 
 const ReactDOM = {
   render,
