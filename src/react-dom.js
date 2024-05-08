@@ -1,4 +1,4 @@
-import { REACT_ELEMENT, REACT_FORWARD_REF, REACT_TEXT } from "./utils"
+import { REACT_ELEMENT, REACT_FORWARD_REF, REACT_TEXT, CREATE, MOVE } from "./utils"
 import { addEvent } from "./event"
 
 function render(VNode, containerDOM) {
@@ -142,6 +142,7 @@ function removeVNode(VNode) {
 
 function deepDOMDiff(oldVNode, newVNode) {
   const diffTypeMap = {
+    // 普通标签比如 div
     ORIGIN_NODE: typeof oldVNode.type === "string",
     CLASS_COMPONENT: typeof oldVNode.type === "function" && oldVNode.type.IS_CLASS_COMPONENT,
     FUNCTION_COMPONENT: typeof oldVNode.type === "function",
@@ -185,7 +186,71 @@ function updateFunctionComponent(oldVNode, newVNode) {
 }
 
 // DOM DIFF 算法的核心
-function updateChildren(parentDOM, oldVNodeChildren, newVNodeChildren) {}
+function updateChildren(parentDOM, oldVNodeChildren, newVNodeChildren) {
+  oldVNodeChildren = Array.isArray(oldVNodeChildren) ? oldVNodeChildren : [oldVNodeChildren]
+  newVNodeChildren = Array.isArray(newVNodeChildren) ? newVNodeChildren : [newVNodeChildren]
+
+  let lastNotChangedIndex = -1
+  const oldKeyChildMap = {}
+  oldVNodeChildren.forEach((oldVNode, index) => {
+    const oldKey = oldVNode && oldVNode.key ? oldVNode.key : index
+    oldKeyChildMap[oldKey] = oldVNode
+  })
+
+  // 遍历新的子虚拟DOM数组，找到可以复用但需要移动的节点，需要重新创建的节点，需要删除的节点，剩下的就是
+  const actions = []
+  newVNodeChildren.forEach((newVNode, index) => {
+    newVNode.index = index
+    const newKey = newVNode.key ? newVNode.key : index
+    const oldVNode = oldKeyChildMap[newKey]
+    if (oldVNode) {
+      deepDOMDiff(oldVNode, newVNode)
+      if (oldVNode.index < lastNotChangedIndex) {
+        actions.push({
+          type: MOVE,
+          newVNode,
+          oldVNode,
+          index,
+        })
+      }
+
+      delete oldKeyChildMap[newKey]
+      lastNotChangedIndex = Math.max(lastNotChangedIndex, oldVNode.index)
+    } else {
+      actions.push({
+        type: CREATE,
+        newVNode,
+        index,
+      })
+    }
+  })
+
+  const VNodeToMove = actions.filter((action) => action.type === MOVE).map((action) => action.oldVNode)
+  const VNodeToDelete = Object.values(oldKeyChildMap)
+  VNodeToMove.concat(VNodeToDelete).forEach((oldVNode) => {
+    const currentDOM = findDomByVNode(oldVNode)
+    currentDOM.remove()
+  })
+
+  actions.forEach((action) => {
+    const { type, oldVNode, newVNode, index } = action
+    const childNodes = parentDOM.childNodes
+    const childNode = childNodes[index]
+    const getDomForInsert = () => {
+      if (type === CREATE) {
+        return createDOM(newVNode)
+      }
+      if (type === MOVE) {
+        return findDomByVNode(oldVNode)
+      }
+    }
+    if (childNode) {
+      parentDOM.insertBefore(getDomForInsert(), childNode)
+    } else {
+      parentDOM.appendChild(getDomForInsert())
+    }
+  })
+}
 
 const ReactDOM = {
   render,
