@@ -52,12 +52,13 @@ class Updater {
         ...newState,
       }
     }, this.ClassComponentInstance.state)
-    this.ClassComponentInstance.state = nextState
-    if (nextProps) this.ClassComponentInstance.props = nextProps
+
     this.pendingStates.length = 0
     if (this.ClassComponentInstance.shouldComponentUpdate && !this.ClassComponentInstance.shouldComponentUpdate(nextProps, nextState)) {
       isShouldUpdate = false
     }
+    this.ClassComponentInstance.state = nextState
+    if (nextProps) this.ClassComponentInstance.props = nextProps
 
     if (isShouldUpdate) this.ClassComponentInstance.update(prevProps, prevState)
   }

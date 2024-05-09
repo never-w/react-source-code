@@ -254,8 +254,6 @@ function updateChildren(parentDOM, oldVNodeChildren, newVNodeChildren) {
       }
     }
     if (childNode) {
-      console.log(childNode)
-      console.log(getDomForInsert())
       parentDOM.insertBefore(getDomForInsert(), childNode)
     } else {
       parentDOM.appendChild(getDomForInsert())

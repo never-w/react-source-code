@@ -137,49 +137,52 @@ import React from "./react"
 //   }
 // }
 
-class DerivedState extends React.Component {
+class Greeting extends React.PureComponent {
+  render() {
+    console.log("Greeting render")
+
+    return (
+      <h3>
+        Hello {this.props.name && "，"} {this.props.name}
+      </h3>
+    )
+  }
+}
+
+class MyClassComponent extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { preId: "wyq", email: "wyq@xx.com" }
+    this.state = { name: "", address: "" }
   }
 
-  static getDerivedStateFromProps(props, state) {
-    if (props.userId !== state.preId) {
-      return {
-        preId: props.userId,
-        email: props.userId + "@xx.com",
-      }
-    }
+  componentDidUpdate() {
+    console.log("MyClassComponent  componentDidUpdate")
+  }
+
+  setName(newName) {
+    this.setState({ name: newName })
+  }
+
+  setAddress(newAddress) {
+    this.setState({ address: newAddress })
   }
 
   render() {
     return (
       <div>
-        <h1>Email:</h1>
-        <h2>{this.state.email}</h2>
+        <label>
+          Name:
+          <input onInput={(e) => this.setName(e.target.value)} />
+        </label>
+        <br />
+        <label>
+          Address:
+          <input onInput={(e) => this.setAddress(e.target.value)} />
+        </label>
+        <Greeting name={this.state.name} />
       </div>
     )
   }
 }
 
-class ParentClass extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { id: "wyq" }
-  }
-
-  changeUser() {
-    this.setState({ id: "gyf" })
-  }
-
-  render() {
-    return (
-      <div>
-        <input type="button" value={"点击改变userId"} onClick={() => this.changeUser()} />
-        <DerivedState userId={this.state.id} />
-      </div>
-    )
-  }
-}
-
-ReactDOM.render(<ParentClass />, document.getElementById("root"))
+ReactDOM.render(<MyClassComponent />, document.getElementById("root"))
