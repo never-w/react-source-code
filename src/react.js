@@ -1,5 +1,5 @@
 import { Component } from "./Component"
-import { REACT_ELEMENT, REACT_FORWARD_REF, toVNode, shallowCompare } from "./utils"
+import { REACT_ELEMENT, REACT_FORWARD_REF, toVNode, shallowCompare, REACT_MEMO } from "./utils"
 
 function createElement(type, properties, children) {
   const ref = properties.ref || null
@@ -43,11 +43,25 @@ class PureComponent extends Component {
   }
 }
 
+/**
+ * $$typeof: Symbol(react.memo)
+ * compare: null
+ * type: f Greeting(_ref)
+ */
+function memo(type, compare) {
+  return {
+    $$typeof: REACT_MEMO,
+    type,
+    compare,
+  }
+}
+
 const React = {
   createElement,
   Component,
   createRef,
   forwardRef,
   PureComponent,
+  memo,
 }
 export default React

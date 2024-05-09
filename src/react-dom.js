@@ -1,4 +1,4 @@
-import { REACT_ELEMENT, REACT_FORWARD_REF, REACT_TEXT, CREATE, MOVE } from "./utils"
+import { REACT_ELEMENT, REACT_FORWARD_REF, REACT_TEXT, CREATE, MOVE, REACT_MEMO } from "./utils"
 import { addEvent } from "./event"
 
 function render(VNode, containerDOM) {
@@ -17,9 +17,14 @@ function createDOM(VNode) {
   const { type, props, ref } = VNode
   let dom
 
+  // TODO: 这里还在实现中
+  if (type && type.$$typeof === REACT_MEMO) {
+    return getDomByMemoFunctionComponent(VNode)
+  }
   if (type && type.$$typeof === REACT_FORWARD_REF) {
     return getDomByForwardRefFunction(VNode)
   }
+
   if (typeof type === "function" && VNode.$$typeof === REACT_ELEMENT && type.IS_CLASS_COMPONENT) {
     return getDomByClassComponent(VNode)
   }
@@ -156,6 +161,7 @@ function deepDOMDiff(oldVNode, newVNode) {
     CLASS_COMPONENT: typeof oldVNode.type === "function" && oldVNode.type.IS_CLASS_COMPONENT,
     FUNCTION_COMPONENT: typeof oldVNode.type === "function",
     TEXT: oldVNode.type === REACT_TEXT,
+    MEMO: oldVNode.type === REACT_MEMO,
   }
 
   const DIFF_TYPE = Object.keys(diffTypeMap).filter((key) => diffTypeMap[key])[0]
@@ -174,6 +180,9 @@ function deepDOMDiff(oldVNode, newVNode) {
     case "TEXT":
       newVNode.dom = findDomByVNode(oldVNode)
       newVNode.dom.textContent = newVNode.props.text
+      break
+    case "MEMO":
+      updateMemoFunctionComponent(oldVNode, newVNode)
       break
     default:
       break

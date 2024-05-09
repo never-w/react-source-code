@@ -137,17 +137,27 @@ import React from "./react"
 //   }
 // }
 
-class Greeting extends React.PureComponent {
-  render() {
-    console.log("Greeting render")
+// class Greeting extends React.PureComponent {
+//   render() {
+//     console.log("Greeting render")
 
-    return (
-      <h3>
-        Hello {this.props.name && "，"} {this.props.name}
-      </h3>
-    )
-  }
-}
+//     return (
+//       <h3>
+//         Hello {this.props.name && "，"} {this.props.name}
+//       </h3>
+//     )
+//   }
+// }
+
+const Greeting = React.memo(function Greeting({ name }) {
+  console.log("Greeting render")
+  return (
+    <h3>
+      Hello{name && "，"}
+      {name}!
+    </h3>
+  )
+})
 
 class MyClassComponent extends React.Component {
   constructor(props) {
