@@ -1,4 +1,5 @@
 import { findDomByVNode, updateDomTree } from "./react-dom"
+import { deepClone } from "./utils"
 
 export let updaterQueue = {
   isBatch: false,
@@ -42,6 +43,9 @@ class Updater {
     if (this.pendingStates.length === 0 && !nextProps) return
     let isShouldUpdate = true
 
+    let prevProps = deepClone(this.ClassComponentInstance.props)
+    let prevState = deepClone(this.ClassComponentInstance.state)
+
     const nextState = this.pendingStates.reduce((preState, newState) => {
       return {
         ...preState,
@@ -55,7 +59,7 @@ class Updater {
       isShouldUpdate = false
     }
 
-    if (isShouldUpdate) this.ClassComponentInstance.update()
+    if (isShouldUpdate) this.ClassComponentInstance.update(prevProps, prevState)
   }
 }
 
@@ -75,7 +79,7 @@ export class Component {
     this.updater.addState(partialState)
   }
 
-  update() {
+  update(prevProps, prevState) {
     // 1. 获取重新执行render函数后的虚拟DOM 新虚拟DOM
     // 2. 根据新虚拟DOM生成新的真实DOM
     // 3. 将真实DOM挂载到页面上
@@ -87,10 +91,11 @@ export class Component {
       this.state = { ...this.state, ...newState }
     }
 
+    let snapshot = this.getSnapshotBeforeUpdate && this.getSnapshotBeforeUpdate(prevProps, prevState)
     let newVNode = this.render()
     updateDomTree(oldVNode, newVNode, oldDOM)
     this.oldVNode = newVNode
 
-    if (this.componentDidUpdate) this.componentDidUpdate(this.props, this.state)
+    if (this.componentDidUpdate) this.componentDidUpdate(this.props, this.state, snapshot)
   }
 }
