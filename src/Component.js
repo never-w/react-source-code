@@ -38,18 +38,24 @@ class Updater {
     }
   }
 
-  launchUpdate() {
-    if (this.pendingStates.length === 0) return
+  launchUpdate(nextProps) {
+    if (this.pendingStates.length === 0 && !nextProps) return
+    let isShouldUpdate = true
 
-    this.ClassComponentInstance.state = this.pendingStates.reduce((preState, newState) => {
+    const nextState = this.pendingStates.reduce((preState, newState) => {
       return {
         ...preState,
         ...newState,
       }
     }, this.ClassComponentInstance.state)
-
+    this.ClassComponentInstance.state = nextState
+    if (nextProps) this.ClassComponentInstance.props = nextProps
     this.pendingStates.length = 0
-    this.ClassComponentInstance.update()
+    if (this.ClassComponentInstance.shouldComponentUpdate && !this.ClassComponentInstance.shouldComponentUpdate(nextProps, nextState)) {
+      isShouldUpdate = false
+    }
+
+    if (isShouldUpdate) this.ClassComponentInstance.update()
   }
 }
 
@@ -73,14 +79,18 @@ export class Component {
     // 1. 获取重新执行render函数后的虚拟DOM 新虚拟DOM
     // 2. 根据新虚拟DOM生成新的真实DOM
     // 3. 将真实DOM挂载到页面上
-    let oldVNode = this.oldVNode // TODO: 让类组件拥有一个oldVNode
-    let oldDOM = findDomByVNode(oldVNode) // TODO: 将真实DOM保存到对应的虚拟DOM上
+    let oldVNode = this.oldVNode
+    let oldDOM = findDomByVNode(oldVNode)
+
+    if (this.constructor.getDerivedStateFromProps) {
+      const newState = this.constructor.getDerivedStateFromProps(this.props, this.state)
+      this.state = { ...this.state, ...newState }
+    }
+
     let newVNode = this.render()
     updateDomTree(oldVNode, newVNode, oldDOM)
     this.oldVNode = newVNode
 
-    if (this.componentDidUpdate) {
-      this.componentDidUpdate(this.props, this.state)
-    }
+    if (this.componentDidUpdate) this.componentDidUpdate(this.props, this.state)
   }
 }

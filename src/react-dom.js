@@ -53,6 +53,7 @@ function getDomByClassComponent(VNode) {
   let instance = new type(props)
   let renderVNode = instance.render()
   instance.oldVNode = renderVNode
+  VNode.classInstance = instance
   // 绑定ref
   ref && (ref.current = instance)
   if (!renderVNode) return null
@@ -181,7 +182,7 @@ function deepDOMDiff(oldVNode, newVNode) {
 
 function updateClassComponent(oldVNode, newVNode) {
   const classInstance = (newVNode.classInstance = oldVNode.classInstance)
-  classInstance.updater.launchUpdate()
+  classInstance.updater.launchUpdate(newVNode.props)
 }
 
 function updateFunctionComponent(oldVNode, newVNode) {
@@ -195,8 +196,8 @@ function updateFunctionComponent(oldVNode, newVNode) {
 
 // DOM DIFF 算法的核心
 function updateChildren(parentDOM, oldVNodeChildren, newVNodeChildren) {
-  oldVNodeChildren = Array.isArray(oldVNodeChildren) ? oldVNodeChildren : [oldVNodeChildren]
-  newVNodeChildren = Array.isArray(newVNodeChildren) ? newVNodeChildren : [newVNodeChildren]
+  oldVNodeChildren = Array.isArray(oldVNodeChildren) ? oldVNodeChildren.filter(Boolean) : [oldVNodeChildren].filter(Boolean)
+  newVNodeChildren = Array.isArray(newVNodeChildren) ? newVNodeChildren.filter(Boolean) : [newVNodeChildren].filter(Boolean)
 
   let lastNotChangedIndex = -1
   const oldKeyChildMap = {}
