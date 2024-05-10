@@ -3,7 +3,7 @@
 
 // 自己实现的
 import ReactDOM from "./react-dom"
-import React, { useState, useReducer } from "./react"
+import React, { useState, useEffect, useLayoutEffect } from "./react"
 
 // 测试 setState 组件状态变更
 // class ClassComponent extends React.Component {
@@ -196,31 +196,86 @@ import React, { useState, useReducer } from "./react"
 //   }
 // }
 
-function reducer(state, action) {
-  if (action.type === "incremented_age") {
-    return {
-      age: state.age + 1,
-    }
-  }
+// 测试 useReducer
+// function reducer(state, action) {
+//   if (action.type === "incremented_age") {
+//     return {
+//       age: state.age + 1,
+//     }
+//   }
 
-  throw Error("Unknown action.")
+//   throw Error("Unknown action.")
+// }
+
+// function Counter() {
+//   const [state, dispatch] = useReducer(reducer, { age: 42 })
+
+//   return (
+//     <div>
+//       <button
+//         onClick={() => {
+//           dispatch({ type: "incremented_age" })
+//         }}
+//       >
+//         Increment age
+//       </button>
+//       <p>Hello! You are {state.age}</p>
+//     </div>
+//   )
+// }
+
+function createConnection(serverUrl, roomId) {
+  // 真正的实现会实际连接到服务器
+  return {
+    connect() {
+      console.log('✅ Connecting to "' + roomId + '" room at ' + serverUrl + "...")
+    },
+    disconnect() {
+      console.log('❌ Disconnected from "' + roomId + '" room at ' + serverUrl)
+    },
+  }
 }
 
-function Counter() {
-  const [state, dispatch] = useReducer(reducer, { age: 42 })
+function ChatRoom({ roomId }) {
+  const [serverUrl, setServerUrl] = useState("https://localhost:1234")
+
+  useLayoutEffect(() => {
+    const connection = createConnection(serverUrl, roomId)
+    connection.connect()
+    return () => {
+      connection.disconnect()
+    }
+  }, [roomId, serverUrl])
 
   return (
     <div>
-      <button
-        onClick={() => {
-          dispatch({ type: "incremented_age" })
-        }}
-      >
-        Increment age
-      </button>
-      <p>Hello! You are {state.age}</p>
+      <label>
+        Server URL: <input value={serverUrl} onInput={(e) => setServerUrl(e.target.value)} />
+      </label>
+      <h1>Welcome to the {roomId} room!</h1>
     </div>
   )
 }
 
-ReactDOM.render(<Counter />, document.getElementById("root"))
+function App() {
+  const [roomId, setRoomId] = useState("general")
+  const [show, setShow] = useState(false)
+
+  return (
+    <div>
+      <label>
+        Choose the chat room:{" "}
+        <select value={roomId} onChange={(e) => setRoomId(e.target.value)}>
+          <option value="general">general</option>
+          <option value="travel">travel</option>
+          <option value="music">music</option>
+        </select>
+      </label>
+      <button onClick={() => setShow(!show)}>{show ? "Close chat" : "Open chat"}</button>
+      {show && <hr />}
+      {show && <ChatRoom roomId={roomId} />}
+    </div>
+  )
+}
+
+ReactDOM.render(<App />, document.getElementById("root"))

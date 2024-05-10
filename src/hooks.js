@@ -29,3 +29,29 @@ export function useReducer(reducer, initialValue) {
 
   return [states[hookIndex++], dispatch]
 }
+
+export function useEffect(effectFunction, deps = []) {
+  const currentIndex = hookIndex
+  const [destroyFunction, preDeps] = states[hookIndex] || [null, null]
+
+  if (!states[hookIndex] || deps.some((item, index) => item !== preDeps[index])) {
+    setTimeout(() => {
+      destroyFunction?.()
+      states[currentIndex] = [effectFunction(), deps]
+    })
+  }
+  hookIndex++
+}
+
+export function useLayoutEffect(effectFunction, deps = []) {
+  const currentIndex = hookIndex
+  const [destroyFunction, preDeps] = states[hookIndex] || [null, null]
+
+  if (!states[hookIndex] || deps.some((item, index) => item !== preDeps[index])) {
+    queueMicrotask(() => {
+      destroyFunction?.()
+      states[currentIndex] = [effectFunction(), deps]
+    })
+  }
+  hookIndex++
+}

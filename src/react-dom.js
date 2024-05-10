@@ -121,6 +121,10 @@ function setPropsForDOM(dom, VNodeProps = {}) {
 function mountArray(children, parent) {
   if (!Array.isArray(children)) return
   for (let i = 0; i < children.length; i++) {
+    if (!children[i]) {
+      children.splice(i, 1)
+      continue
+    }
     children[i].index = i
     mount(children[i], parent)
   }
