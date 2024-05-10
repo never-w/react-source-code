@@ -3,7 +3,7 @@
 
 // 自己实现的
 import ReactDOM from "./react-dom"
-import React, { useState } from "./react"
+import React, { useState, useReducer } from "./react"
 
 // 测试 setState 组件状态变更
 // class ClassComponent extends React.Component {
@@ -196,14 +196,31 @@ import React, { useState } from "./react"
 //   }
 // }
 
-function Counter() {
-  const [count, setCount] = useState(0)
-
-  const handleClick = () => {
-    setCount(count + 1)
+function reducer(state, action) {
+  if (action.type === "incremented_age") {
+    return {
+      age: state.age + 1,
+    }
   }
 
-  return <button onClick={handleClick}>You pressed me {count} times</button>
+  throw Error("Unknown action.")
+}
+
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, { age: 42 })
+
+  return (
+    <div>
+      <button
+        onClick={() => {
+          dispatch({ type: "incremented_age" })
+        }}
+      >
+        Increment age
+      </button>
+      <p>Hello! You are {state.age}</p>
+    </div>
+  )
 }
 
 ReactDOM.render(<Counter />, document.getElementById("root"))
