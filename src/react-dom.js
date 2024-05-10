@@ -1,10 +1,18 @@
 import { REACT_ELEMENT, REACT_FORWARD_REF, REACT_TEXT, CREATE, MOVE, REACT_MEMO, shallowCompare } from "./utils"
 import { addEvent } from "./event"
+import { resetHookIndex } from "./hooks"
+
+export let emitUpdateForHooks
 
 function render(VNode, containerDOM) {
   // 将虚拟 DOM 转化成真实 DOM
   // 将得到的真实 DOM 挂载到 containerDOM 中
   mount(VNode, containerDOM)
+
+  emitUpdateForHooks = () => {
+    resetHookIndex()
+    updateDomTree(VNode, VNode, findDomByVNode(VNode))
+  }
 }
 
 function mount(VNode, containerDOM) {
@@ -87,8 +95,8 @@ function getDomByMemoFunctionComponent(VNode) {
 function getDomByFunctionComponent(VNode) {
   let { type, props } = VNode
   let renderVNode = type(props)
-
   if (!renderVNode) return null
+  VNode.oldRenderVNode = renderVNode
   const dom = createDOM(renderVNode)
   VNode.dom = dom
   return dom

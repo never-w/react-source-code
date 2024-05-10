@@ -3,7 +3,7 @@
 
 // 自己实现的
 import ReactDOM from "./react-dom"
-import React from "./react"
+import React, { useState } from "./react"
 
 // 测试 setState 组件状态变更
 // class ClassComponent extends React.Component {
@@ -149,50 +149,61 @@ import React from "./react"
 //   }
 // }
 
-const Greeting = React.memo(function Greeting({ name }) {
-  console.log("Greeting render")
-  return (
-    <h3>
-      Hello{name && "，"}
-      {name}!
-    </h3>
-  )
-})
+// memo 测试
+// const Greeting = React.memo(function Greeting({ name }) {
+//   console.log("Greeting render")
+//   return (
+//     <h3>
+//       Hello{name && "，"}
+//       {name}!
+//     </h3>
+//   )
+// })
 
-class MyClassComponent extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { name: "", address: "" }
+// class MyClassComponent extends React.Component {
+//   constructor(props) {
+//     super(props)
+//     this.state = { name: "", address: "" }
+//   }
+
+//   componentDidUpdate() {
+//     console.log("MyClassComponent  componentDidUpdate")
+//   }
+
+//   setName(newName) {
+//     this.setState({ name: newName })
+//   }
+
+//   setAddress(newAddress) {
+//     this.setState({ address: newAddress })
+//   }
+
+//   render() {
+//     return (
+//       <div>
+//         <label>
+//           Name:
+//           <input onInput={(e) => this.setName(e.target.value)} />
+//         </label>
+//         <br />
+//         <label>
+//           Address:
+//           <input onInput={(e) => this.setAddress(e.target.value)} />
+//         </label>
+//         <Greeting name={this.state.name} />
+//       </div>
+//     )
+//   }
+// }
+
+function Counter() {
+  const [count, setCount] = useState(0)
+
+  const handleClick = () => {
+    setCount(count + 1)
   }
 
-  componentDidUpdate() {
-    console.log("MyClassComponent  componentDidUpdate")
-  }
-
-  setName(newName) {
-    this.setState({ name: newName })
-  }
-
-  setAddress(newAddress) {
-    this.setState({ address: newAddress })
-  }
-
-  render() {
-    return (
-      <div>
-        <label>
-          Name:
-          <input onInput={(e) => this.setName(e.target.value)} />
-        </label>
-        <br />
-        <label>
-          Address:
-          <input onInput={(e) => this.setAddress(e.target.value)} />
-        </label>
-        <Greeting name={this.state.name} />
-      </div>
-    )
-  }
+  return <button onClick={handleClick}>You pressed me {count} times</button>
 }
 
-ReactDOM.render(<MyClassComponent />, document.getElementById("root"))
+ReactDOM.render(<Counter />, document.getElementById("root"))
