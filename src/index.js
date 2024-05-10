@@ -3,7 +3,7 @@
 
 // 自己实现的
 import ReactDOM from "./react-dom"
-import React, { useState, useEffect, useLayoutEffect } from "./react"
+import React, { useState, useEffect, useLayoutEffect, useRef } from "./react"
 
 // 测试 setState 组件状态变更
 // class ClassComponent extends React.Component {
@@ -224,58 +224,70 @@ import React, { useState, useEffect, useLayoutEffect } from "./react"
 //   )
 // }
 
-function createConnection(serverUrl, roomId) {
-  // 真正的实现会实际连接到服务器
-  return {
-    connect() {
-      console.log('✅ Connecting to "' + roomId + '" room at ' + serverUrl + "...")
-    },
-    disconnect() {
-      console.log('❌ Disconnected from "' + roomId + '" room at ' + serverUrl)
-    },
+// 测试 useEffect
+// function createConnection(serverUrl, roomId) {
+//   // 真正的实现会实际连接到服务器
+//   return {
+//     connect() {
+//       console.log('✅ Connecting to "' + roomId + '" room at ' + serverUrl + "...")
+//     },
+//     disconnect() {
+//       console.log('❌ Disconnected from "' + roomId + '" room at ' + serverUrl)
+//     },
+//   }
+// }
+
+// function ChatRoom({ roomId }) {
+//   const [serverUrl, setServerUrl] = useState("https://localhost:1234")
+
+//   useLayoutEffect(() => {
+//     const connection = createConnection(serverUrl, roomId)
+//     connection.connect()
+//     return () => {
+//       connection.disconnect()
+//     }
+//   }, [roomId, serverUrl])
+
+//   return (
+//     <div>
+//       <label>
+//         Server URL: <input value={serverUrl} onInput={(e) => setServerUrl(e.target.value)} />
+//       </label>
+//       <h1>Welcome to the {roomId} room!</h1>
+//     </div>
+//   )
+// }
+
+// function App() {
+//   const [roomId, setRoomId] = useState("general")
+//   const [show, setShow] = useState(false)
+
+//   return (
+//     <div>
+//       <label>
+//         Choose the chat room:{" "}
+//         <select value={roomId} onChange={(e) => setRoomId(e.target.value)}>
+//           <option value="general">general</option>
+//           <option value="travel">travel</option>
+//           <option value="music">music</option>
+//         </select>
+//       </label>
+//       <button onClick={() => setShow(!show)}>{show ? "Close chat" : "Open chat"}</button>
+//       {show && <hr />}
+//       {show && <ChatRoom roomId={roomId} />}
+//     </div>
+//   )
+// }
+
+function Counter() {
+  let ref = useRef(0)
+
+  function handleClick() {
+    ref.current = ref.current + 1
+    alert("You clicked " + ref.current + " times!")
   }
+
+  return <button onClick={handleClick}>点击！</button>
 }
 
-function ChatRoom({ roomId }) {
-  const [serverUrl, setServerUrl] = useState("https://localhost:1234")
-
-  useLayoutEffect(() => {
-    const connection = createConnection(serverUrl, roomId)
-    connection.connect()
-    return () => {
-      connection.disconnect()
-    }
-  }, [roomId, serverUrl])
-
-  return (
-    <div>
-      <label>
-        Server URL: <input value={serverUrl} onInput={(e) => setServerUrl(e.target.value)} />
-      </label>
-      <h1>Welcome to the {roomId} room!</h1>
-    </div>
-  )
-}
-
-function App() {
-  const [roomId, setRoomId] = useState("general")
-  const [show, setShow] = useState(false)
-
-  return (
-    <div>
-      <label>
-        Choose the chat room:{" "}
-        <select value={roomId} onChange={(e) => setRoomId(e.target.value)}>
-          <option value="general">general</option>
-          <option value="travel">travel</option>
-          <option value="music">music</option>
-        </select>
-      </label>
-      <button onClick={() => setShow(!show)}>{show ? "Close chat" : "Open chat"}</button>
-      {show && <hr />}
-      {show && <ChatRoom roomId={roomId} />}
-    </div>
-  )
-}
-
-ReactDOM.render(<App />, document.getElementById("root"))
+ReactDOM.render(<Counter />, document.getElementById("root"))
